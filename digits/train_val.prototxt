@@ -4,129 +4,78 @@ layer {
   type: "Data"
   top: "data"
   top: "label"
-  include {
-    phase: TRAIN
-  }
+
   transform_param {
     mirror: true
     crop_size: 299
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
   }
   data_param {
-    source: "/mnt/disk/ILSVRC2012/300px_ilsvrc12_train_lmdb"
-    batch_size: 22
-    backend: LMDB
+    batch_size: 25
   }
+  include { stage: "train" }
 }
 layer {
   name: "data"
   type: "Data"
   top: "data"
   top: "label"
-  include {
-    phase: TEST
-  }
+
   transform_param {
     mirror: false
     crop_size: 299
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
   }
   data_param {
-    source: "/mnt/disk/ILSVRC2012/300px_ilsvrc12_val_lmdb"
     batch_size: 5
-    backend: LMDB
   }
-}
-layer {
-  name: "data"
-  type: "Data"
-  top: "data"
-  top: "label"
-  include {
-    phase: TRAIN
-  }
-  transform_param {
-    mirror: true
-    crop_size: 299
-    mean_file: "/home/smichalowski/DIGITS/digits/jobs/20160627-223013-e18a/mean.binaryproto"
-  }
-  data_param {
-    source: "/home/smichalowski/DIGITS/digits/jobs/20160627-223013-e18a/train_db"
-    batch_size: 22
-    backend: LMDB
-  }
-}
-layer {
-  name: "data"
-  type: "Data"
-  top: "data"
-  top: "label"
-  include {
-    phase: TEST
-  }
-  transform_param {
-    mirror: false
-    crop_size: 299
-    mean_file: "/home/smichalowski/DIGITS/digits/jobs/20160627-223013-e18a/mean.binaryproto"
-  }
-  data_param {
-    source: "/home/smichalowski/DIGITS/digits/jobs/20160627-223013-e18a/val_db"
-    batch_size: 5
-    backend: LMDB
-  }
-}
-layer {
+  include { stage: "val" }
+
+
+}layer {
   name: "conv_conv2d"
   type: "Convolution"
   bottom: "data"
   top: "conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 32
     bias_term: false
+    num_output: 32
     pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "conv_batchnorm"
   type: "BatchNorm"
   bottom: "conv_conv2d"
   top: "conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -134,55 +83,52 @@ layer {
   type: "ReLU"
   bottom: "conv_conv2d_bn"
   top: "conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "conv_1_1_conv2d"
   type: "Convolution"
   bottom: "conv_conv2d_relu"
   top: "conv_1_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 32
     bias_term: false
+    num_output: 32
     pad: 0
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "conv_1_1_batchnorm"
   type: "BatchNorm"
   bottom: "conv_1_1_conv2d"
   top: "conv_1_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -190,55 +136,52 @@ layer {
   type: "ReLU"
   bottom: "conv_1_1_conv2d_bn"
   top: "conv_1_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "conv_2_2_conv2d"
   type: "Convolution"
   bottom: "conv_1_1_conv2d_relu"
   top: "conv_2_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "conv_2_2_batchnorm"
   type: "BatchNorm"
   bottom: "conv_2_2_conv2d"
   top: "conv_2_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -246,67 +189,63 @@ layer {
   type: "ReLU"
   bottom: "conv_2_2_conv2d_bn"
   top: "conv_2_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "pool"
   type: "Pooling"
   bottom: "conv_2_2_conv2d_relu"
   top: "pool"
   pooling_param {
     pool: MAX
+    pad: 0
     kernel_size: 3
     stride: 2
-    pad: 0
   }
-}
-layer {
+}layer {
   name: "conv_3_3_conv2d"
   type: "Convolution"
   bottom: "pool"
   top: "conv_3_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 80
     bias_term: false
+    num_output: 80
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "conv_3_3_batchnorm"
   type: "BatchNorm"
   bottom: "conv_3_3_conv2d"
   top: "conv_3_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -314,55 +253,52 @@ layer {
   type: "ReLU"
   bottom: "conv_3_3_conv2d_bn"
   top: "conv_3_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "conv_4_4_conv2d"
   type: "Convolution"
   bottom: "conv_3_3_conv2d_relu"
   top: "conv_4_4_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "conv_4_4_batchnorm"
   type: "BatchNorm"
   bottom: "conv_4_4_conv2d"
   top: "conv_4_4_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -370,67 +306,63 @@ layer {
   type: "ReLU"
   bottom: "conv_4_4_conv2d_bn"
   top: "conv_4_4_conv2d_relu"
-}
-layer {
+}layer {
   name: "pool1"
   type: "Pooling"
   bottom: "conv_4_4_conv2d_relu"
   top: "pool1"
   pooling_param {
     pool: MAX
+    pad: 0
     kernel_size: 3
     stride: 2
-    pad: 0
   }
-}
-layer {
+}layer {
   name: "mixed_conv_conv2d"
   type: "Convolution"
   bottom: "pool1"
   top: "mixed_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_conv_conv2d"
   top: "mixed_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -438,55 +370,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_conv_conv2d_bn"
   top: "mixed_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_tower_conv_conv2d"
   type: "Convolution"
   bottom: "pool1"
   top: "mixed_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 48
     bias_term: false
+    num_output: 48
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_conv_conv2d"
   top: "mixed_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -494,55 +423,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_tower_conv_conv2d_bn"
   top: "mixed_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_tower_conv_conv2d_relu"
   top: "mixed_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 2
     kernel_size: 5
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_conv_1_conv2d"
   top: "mixed_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -550,55 +476,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_tower_conv_1_conv2d_bn"
   top: "mixed_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "pool1"
   top: "mixed_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_1_conv_conv2d"
   top: "mixed_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -606,55 +529,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_tower_1_conv_conv2d_bn"
   top: "mixed_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_tower_1_conv_conv2d_relu"
   top: "mixed_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_1_conv_1_conv2d"
   top: "mixed_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -662,55 +582,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_tower_1_conv_1_conv2d_bn"
   top: "mixed_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_tower_1_conv_1_conv2d_relu"
   top: "mixed_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_1_conv_2_conv2d"
   top: "mixed_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -718,67 +635,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_tower_1_conv_2_conv2d_bn"
   top: "mixed_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_pool"
   type: "Pooling"
   bottom: "pool1"
   top: "AVE_pool_mixed_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_pool"
   top: "mixed_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 32
     bias_term: false
+    num_output: 32
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_tower_2_conv_conv2d"
   top: "mixed_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -789,12 +702,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_chconcat"
-  type: "Concat"
   bottom: "mixed_conv_conv2d_relu"
-  bottom: "mixed_tower_conv_1_conv2d_relu"
-  bottom: "mixed_tower_1_conv_2_conv2d_relu"
-  bottom: "mixed_tower_2_conv_conv2d_relu"
+bottom: "mixed_tower_conv_1_conv2d_relu"
+bottom: "mixed_tower_1_conv_2_conv2d_relu"
+bottom: "mixed_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -804,49 +718,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_chconcat"
   top: "mixed_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_conv_conv2d"
   top: "mixed_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -854,55 +766,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_conv_conv2d_bn"
   top: "mixed_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_1_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_chconcat"
   top: "mixed_1_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 48
     bias_term: false
+    num_output: 48
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_conv_conv2d"
   top: "mixed_1_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -910,55 +819,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_tower_conv_conv2d_bn"
   top: "mixed_1_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_1_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_1_tower_conv_conv2d_relu"
   top: "mixed_1_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 2
     kernel_size: 5
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_conv_1_conv2d"
   top: "mixed_1_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -966,55 +872,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_tower_conv_1_conv2d_bn"
   top: "mixed_1_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_1_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_chconcat"
   top: "mixed_1_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_1_conv_conv2d"
   top: "mixed_1_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1022,55 +925,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_tower_1_conv_conv2d_bn"
   top: "mixed_1_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_1_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_1_tower_1_conv_conv2d_relu"
   top: "mixed_1_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_1_conv_1_conv2d"
   top: "mixed_1_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1078,55 +978,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_tower_1_conv_1_conv2d_bn"
   top: "mixed_1_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_1_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_1_tower_1_conv_1_conv2d_relu"
   top: "mixed_1_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_1_conv_2_conv2d"
   top: "mixed_1_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1134,67 +1031,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_1_tower_1_conv_2_conv2d_bn"
   top: "mixed_1_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_1_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_chconcat"
   top: "AVE_pool_mixed_1_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_1_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_1_pool"
   top: "mixed_1_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_1_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_1_tower_2_conv_conv2d"
   top: "mixed_1_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1205,12 +1098,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_1_chconcat"
-  type: "Concat"
   bottom: "mixed_1_conv_conv2d_relu"
-  bottom: "mixed_1_tower_conv_1_conv2d_relu"
-  bottom: "mixed_1_tower_1_conv_2_conv2d_relu"
-  bottom: "mixed_1_tower_2_conv_conv2d_relu"
+bottom: "mixed_1_tower_conv_1_conv2d_relu"
+bottom: "mixed_1_tower_1_conv_2_conv2d_relu"
+bottom: "mixed_1_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_1_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -1220,49 +1114,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_1_chconcat"
   top: "mixed_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_conv_conv2d"
   top: "mixed_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1270,55 +1162,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_conv_conv2d_bn"
   top: "mixed_2_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_2_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_1_chconcat"
   top: "mixed_2_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 48
     bias_term: false
+    num_output: 48
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_conv_conv2d"
   top: "mixed_2_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1326,55 +1215,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_tower_conv_conv2d_bn"
   top: "mixed_2_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_2_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_2_tower_conv_conv2d_relu"
   top: "mixed_2_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 2
     kernel_size: 5
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_conv_1_conv2d"
   top: "mixed_2_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1382,55 +1268,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_tower_conv_1_conv2d_bn"
   top: "mixed_2_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_2_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_1_chconcat"
   top: "mixed_2_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_1_conv_conv2d"
   top: "mixed_2_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1438,55 +1321,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_tower_1_conv_conv2d_bn"
   top: "mixed_2_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_2_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_2_tower_1_conv_conv2d_relu"
   top: "mixed_2_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_1_conv_1_conv2d"
   top: "mixed_2_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1494,55 +1374,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_tower_1_conv_1_conv2d_bn"
   top: "mixed_2_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_2_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_2_tower_1_conv_1_conv2d_relu"
   top: "mixed_2_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_1_conv_2_conv2d"
   top: "mixed_2_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1550,67 +1427,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_2_tower_1_conv_2_conv2d_bn"
   top: "mixed_2_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_2_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_1_chconcat"
   top: "AVE_pool_mixed_2_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_2_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_2_pool"
   top: "mixed_2_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_2_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_2_tower_2_conv_conv2d"
   top: "mixed_2_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1621,12 +1494,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_2_chconcat"
-  type: "Concat"
   bottom: "mixed_2_conv_conv2d_relu"
-  bottom: "mixed_2_tower_conv_1_conv2d_relu"
-  bottom: "mixed_2_tower_1_conv_2_conv2d_relu"
-  bottom: "mixed_2_tower_2_conv_conv2d_relu"
+bottom: "mixed_2_tower_conv_1_conv2d_relu"
+bottom: "mixed_2_tower_1_conv_2_conv2d_relu"
+bottom: "mixed_2_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_2_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -1636,49 +1510,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_2_chconcat"
   top: "mixed_3_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
     pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_3_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_3_conv_conv2d"
   top: "mixed_3_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1686,55 +1558,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_3_conv_conv2d_bn"
   top: "mixed_3_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_3_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_2_chconcat"
   top: "mixed_3_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 64
     bias_term: false
+    num_output: 64
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_3_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_3_tower_conv_conv2d"
   top: "mixed_3_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1742,55 +1611,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_3_tower_conv_conv2d_bn"
   top: "mixed_3_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_3_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_3_tower_conv_conv2d_relu"
   top: "mixed_3_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_3_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_3_tower_conv_1_conv2d"
   top: "mixed_3_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1798,55 +1664,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_3_tower_conv_1_conv2d_bn"
   top: "mixed_3_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_3_tower_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_3_tower_conv_1_conv2d_relu"
   top: "mixed_3_tower_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 96
     bias_term: false
+    num_output: 96
     pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_3_tower_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_3_tower_conv_2_conv2d"
   top: "mixed_3_tower_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1854,26 +1717,26 @@ layer {
   type: "ReLU"
   bottom: "mixed_3_tower_conv_2_conv2d_bn"
   top: "mixed_3_tower_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "max_pool_mixed_3_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_2_chconcat"
   top: "max_pool_mixed_3_pool"
   pooling_param {
     pool: MAX
+    pad: 0
     kernel_size: 3
     stride: 2
-    pad: 0
   }
 }
 layer {
   name: "ch_concat_mixed_3_chconcat"
-  type: "Concat"
   bottom: "max_pool_mixed_3_pool"
-  bottom: "mixed_3_conv_conv2d_relu"
-  bottom: "mixed_3_tower_conv_2_conv2d_relu"
+bottom: "mixed_3_conv_conv2d_relu"
+bottom: "mixed_3_tower_conv_2_conv2d_relu"
+
   top: "ch_concat_mixed_3_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -1883,49 +1746,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_3_chconcat"
   top: "mixed_4_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_conv_conv2d"
   top: "mixed_4_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1933,55 +1794,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_conv_conv2d_bn"
   top: "mixed_4_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_3_chconcat"
   top: "mixed_4_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_conv_conv2d"
   top: "mixed_4_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -1989,57 +1847,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_conv_conv2d_bn"
   top: "mixed_4_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_conv_conv2d_relu"
   top: "mixed_4_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_conv_1_conv2d"
   top: "mixed_4_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2047,57 +1902,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_conv_1_conv2d_bn"
   top: "mixed_4_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_conv_1_conv2d_relu"
   top: "mixed_4_tower_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_conv_2_conv2d"
   top: "mixed_4_tower_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2105,55 +1957,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_conv_2_conv2d_bn"
   top: "mixed_4_tower_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_3_chconcat"
   top: "mixed_4_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_1_conv_conv2d"
   top: "mixed_4_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2161,57 +2010,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_1_conv_conv2d_bn"
   top: "mixed_4_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_1_conv_conv2d_relu"
   top: "mixed_4_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_1_conv_1_conv2d"
   top: "mixed_4_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2219,57 +2065,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_1_conv_1_conv2d_bn"
   top: "mixed_4_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_1_conv_1_conv2d_relu"
   top: "mixed_4_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_1_conv_2_conv2d"
   top: "mixed_4_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2277,57 +2120,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_1_conv_2_conv2d_bn"
   top: "mixed_4_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_1_conv_3_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_1_conv_2_conv2d_relu"
   top: "mixed_4_tower_1_conv_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 128
     bias_term: false
+    num_output: 128
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_1_conv_3_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_1_conv_3_conv2d"
   top: "mixed_4_tower_1_conv_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2335,57 +2175,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_1_conv_3_conv2d_bn"
   top: "mixed_4_tower_1_conv_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_4_tower_1_conv_4_conv2d"
   type: "Convolution"
   bottom: "mixed_4_tower_1_conv_3_conv2d_relu"
   top: "mixed_4_tower_1_conv_4_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_1_conv_4_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_1_conv_4_conv2d"
   top: "mixed_4_tower_1_conv_4_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2393,67 +2230,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_4_tower_1_conv_4_conv2d_bn"
   top: "mixed_4_tower_1_conv_4_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_4_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_3_chconcat"
   top: "AVE_pool_mixed_4_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_4_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_4_pool"
   top: "mixed_4_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_4_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_4_tower_2_conv_conv2d"
   top: "mixed_4_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2464,12 +2297,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_4_chconcat"
-  type: "Concat"
   bottom: "mixed_4_conv_conv2d_relu"
-  bottom: "mixed_4_tower_conv_2_conv2d_relu"
-  bottom: "mixed_4_tower_1_conv_4_conv2d_relu"
-  bottom: "mixed_4_tower_2_conv_conv2d_relu"
+bottom: "mixed_4_tower_conv_2_conv2d_relu"
+bottom: "mixed_4_tower_1_conv_4_conv2d_relu"
+bottom: "mixed_4_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_4_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -2479,49 +2313,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_4_chconcat"
   top: "mixed_5_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_conv_conv2d"
   top: "mixed_5_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2529,55 +2361,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_conv_conv2d_bn"
   top: "mixed_5_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_4_chconcat"
   top: "mixed_5_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_conv_conv2d"
   top: "mixed_5_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2585,57 +2414,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_conv_conv2d_bn"
   top: "mixed_5_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_conv_conv2d_relu"
   top: "mixed_5_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_conv_1_conv2d"
   top: "mixed_5_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2643,57 +2469,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_conv_1_conv2d_bn"
   top: "mixed_5_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_conv_1_conv2d_relu"
   top: "mixed_5_tower_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_conv_2_conv2d"
   top: "mixed_5_tower_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2701,55 +2524,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_conv_2_conv2d_bn"
   top: "mixed_5_tower_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_4_chconcat"
   top: "mixed_5_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_1_conv_conv2d"
   top: "mixed_5_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2757,57 +2577,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_1_conv_conv2d_bn"
   top: "mixed_5_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_1_conv_conv2d_relu"
   top: "mixed_5_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_1_conv_1_conv2d"
   top: "mixed_5_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2815,57 +2632,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_1_conv_1_conv2d_bn"
   top: "mixed_5_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_1_conv_1_conv2d_relu"
   top: "mixed_5_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_1_conv_2_conv2d"
   top: "mixed_5_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2873,57 +2687,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_1_conv_2_conv2d_bn"
   top: "mixed_5_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_1_conv_3_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_1_conv_2_conv2d_relu"
   top: "mixed_5_tower_1_conv_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_1_conv_3_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_1_conv_3_conv2d"
   top: "mixed_5_tower_1_conv_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2931,57 +2742,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_1_conv_3_conv2d_bn"
   top: "mixed_5_tower_1_conv_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_5_tower_1_conv_4_conv2d"
   type: "Convolution"
   bottom: "mixed_5_tower_1_conv_3_conv2d_relu"
   top: "mixed_5_tower_1_conv_4_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_1_conv_4_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_1_conv_4_conv2d"
   top: "mixed_5_tower_1_conv_4_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -2989,67 +2797,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_5_tower_1_conv_4_conv2d_bn"
   top: "mixed_5_tower_1_conv_4_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_5_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_4_chconcat"
   top: "AVE_pool_mixed_5_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_5_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_5_pool"
   top: "mixed_5_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_5_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_5_tower_2_conv_conv2d"
   top: "mixed_5_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3060,12 +2864,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_5_chconcat"
-  type: "Concat"
   bottom: "mixed_5_conv_conv2d_relu"
-  bottom: "mixed_5_tower_conv_2_conv2d_relu"
-  bottom: "mixed_5_tower_1_conv_4_conv2d_relu"
-  bottom: "mixed_5_tower_2_conv_conv2d_relu"
+bottom: "mixed_5_tower_conv_2_conv2d_relu"
+bottom: "mixed_5_tower_1_conv_4_conv2d_relu"
+bottom: "mixed_5_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_5_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -3075,49 +2880,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_5_chconcat"
   top: "mixed_6_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_conv_conv2d"
   top: "mixed_6_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3125,55 +2928,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_conv_conv2d_bn"
   top: "mixed_6_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_5_chconcat"
   top: "mixed_6_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_conv_conv2d"
   top: "mixed_6_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3181,57 +2981,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_conv_conv2d_bn"
   top: "mixed_6_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_conv_conv2d_relu"
   top: "mixed_6_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_conv_1_conv2d"
   top: "mixed_6_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3239,57 +3036,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_conv_1_conv2d_bn"
   top: "mixed_6_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_conv_1_conv2d_relu"
   top: "mixed_6_tower_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_conv_2_conv2d"
   top: "mixed_6_tower_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3297,55 +3091,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_conv_2_conv2d_bn"
   top: "mixed_6_tower_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_5_chconcat"
   top: "mixed_6_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_1_conv_conv2d"
   top: "mixed_6_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3353,57 +3144,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_1_conv_conv2d_bn"
   top: "mixed_6_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_1_conv_conv2d_relu"
   top: "mixed_6_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_1_conv_1_conv2d"
   top: "mixed_6_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3411,57 +3199,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_1_conv_1_conv2d_bn"
   top: "mixed_6_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_1_conv_1_conv2d_relu"
   top: "mixed_6_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_1_conv_2_conv2d"
   top: "mixed_6_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3469,57 +3254,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_1_conv_2_conv2d_bn"
   top: "mixed_6_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_1_conv_3_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_1_conv_2_conv2d_relu"
   top: "mixed_6_tower_1_conv_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 160
     bias_term: false
+    num_output: 160
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_1_conv_3_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_1_conv_3_conv2d"
   top: "mixed_6_tower_1_conv_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3527,57 +3309,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_1_conv_3_conv2d_bn"
   top: "mixed_6_tower_1_conv_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_6_tower_1_conv_4_conv2d"
   type: "Convolution"
   bottom: "mixed_6_tower_1_conv_3_conv2d_relu"
   top: "mixed_6_tower_1_conv_4_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_1_conv_4_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_1_conv_4_conv2d"
   top: "mixed_6_tower_1_conv_4_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3585,67 +3364,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_6_tower_1_conv_4_conv2d_bn"
   top: "mixed_6_tower_1_conv_4_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_6_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_5_chconcat"
   top: "AVE_pool_mixed_6_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_6_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_6_pool"
   top: "mixed_6_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_6_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_6_tower_2_conv_conv2d"
   top: "mixed_6_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3656,12 +3431,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_6_chconcat"
-  type: "Concat"
   bottom: "mixed_6_conv_conv2d_relu"
-  bottom: "mixed_6_tower_conv_2_conv2d_relu"
-  bottom: "mixed_6_tower_1_conv_4_conv2d_relu"
-  bottom: "mixed_6_tower_2_conv_conv2d_relu"
+bottom: "mixed_6_tower_conv_2_conv2d_relu"
+bottom: "mixed_6_tower_1_conv_4_conv2d_relu"
+bottom: "mixed_6_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_6_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -3671,49 +3447,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_6_chconcat"
   top: "mixed_7_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_conv_conv2d"
   top: "mixed_7_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3721,55 +3495,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_conv_conv2d_bn"
   top: "mixed_7_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_6_chconcat"
   top: "mixed_7_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_conv_conv2d"
   top: "mixed_7_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3777,57 +3548,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_conv_conv2d_bn"
   top: "mixed_7_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_conv_conv2d_relu"
   top: "mixed_7_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_conv_1_conv2d"
   top: "mixed_7_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3835,57 +3603,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_conv_1_conv2d_bn"
   top: "mixed_7_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_conv_1_conv2d_relu"
   top: "mixed_7_tower_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_conv_2_conv2d"
   top: "mixed_7_tower_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3893,55 +3658,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_conv_2_conv2d_bn"
   top: "mixed_7_tower_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_6_chconcat"
   top: "mixed_7_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_1_conv_conv2d"
   top: "mixed_7_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -3949,57 +3711,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_1_conv_conv2d_bn"
   top: "mixed_7_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_1_conv_conv2d_relu"
   top: "mixed_7_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_1_conv_1_conv2d"
   top: "mixed_7_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4007,57 +3766,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_1_conv_1_conv2d_bn"
   top: "mixed_7_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_1_conv_1_conv2d_relu"
   top: "mixed_7_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_1_conv_2_conv2d"
   top: "mixed_7_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4065,57 +3821,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_1_conv_2_conv2d_bn"
   top: "mixed_7_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_1_conv_3_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_1_conv_2_conv2d_relu"
   top: "mixed_7_tower_1_conv_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_1_conv_3_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_1_conv_3_conv2d"
   top: "mixed_7_tower_1_conv_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4123,57 +3876,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_1_conv_3_conv2d_bn"
   top: "mixed_7_tower_1_conv_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_7_tower_1_conv_4_conv2d"
   type: "Convolution"
   bottom: "mixed_7_tower_1_conv_3_conv2d_relu"
   top: "mixed_7_tower_1_conv_4_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_1_conv_4_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_1_conv_4_conv2d"
   top: "mixed_7_tower_1_conv_4_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4181,67 +3931,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_7_tower_1_conv_4_conv2d_bn"
   top: "mixed_7_tower_1_conv_4_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_7_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_6_chconcat"
   top: "AVE_pool_mixed_7_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_7_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_7_pool"
   top: "mixed_7_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_7_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_7_tower_2_conv_conv2d"
   top: "mixed_7_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4252,12 +3998,13 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_7_chconcat"
-  type: "Concat"
   bottom: "mixed_7_conv_conv2d_relu"
-  bottom: "mixed_7_tower_conv_2_conv2d_relu"
-  bottom: "mixed_7_tower_1_conv_4_conv2d_relu"
-  bottom: "mixed_7_tower_2_conv_conv2d_relu"
+bottom: "mixed_7_tower_conv_2_conv2d_relu"
+bottom: "mixed_7_tower_1_conv_4_conv2d_relu"
+bottom: "mixed_7_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_7_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -4267,49 +4014,47 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_7_chconcat"
   top: "mixed_8_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_conv_conv2d"
   top: "mixed_8_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4317,55 +4062,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_conv_conv2d_bn"
   top: "mixed_8_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_8_tower_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_8_tower_conv_conv2d_relu"
   top: "mixed_8_tower_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 320
     bias_term: false
+    num_output: 320
     pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_conv_1_conv2d"
   top: "mixed_8_tower_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4373,55 +4115,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_conv_1_conv2d_bn"
   top: "mixed_8_tower_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_8_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_7_chconcat"
   top: "mixed_8_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_1_conv_conv2d"
   top: "mixed_8_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4429,57 +4168,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_1_conv_conv2d_bn"
   top: "mixed_8_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_8_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_8_tower_1_conv_conv2d_relu"
   top: "mixed_8_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 0
+pad_w: 3
+    kernel_h: 1
+kernel_w: 7
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 3
-    kernel_h: 1
-    kernel_w: 7
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_1_conv_1_conv2d"
   top: "mixed_8_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4487,57 +4223,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_1_conv_1_conv2d_bn"
   top: "mixed_8_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_8_tower_1_conv_2_conv2d"
   type: "Convolution"
   bottom: "mixed_8_tower_1_conv_1_conv2d_relu"
   top: "mixed_8_tower_1_conv_2_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
+    pad_h: 3
+pad_w: 0
+    kernel_h: 7
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 3
-    pad_w: 0
-    kernel_h: 7
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_1_conv_2_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_1_conv_2_conv2d"
   top: "mixed_8_tower_1_conv_2_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4545,55 +4278,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_1_conv_2_conv2d_bn"
   top: "mixed_8_tower_1_conv_2_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_8_tower_1_conv_3_conv2d"
   type: "Convolution"
   bottom: "mixed_8_tower_1_conv_2_conv2d_relu"
   top: "mixed_8_tower_1_conv_3_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 3
     stride: 2
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_8_tower_1_conv_3_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_8_tower_1_conv_3_conv2d"
   top: "mixed_8_tower_1_conv_3_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4601,26 +4331,26 @@ layer {
   type: "ReLU"
   bottom: "mixed_8_tower_1_conv_3_conv2d_bn"
   top: "mixed_8_tower_1_conv_3_conv2d_relu"
-}
-layer {
+}layer {
   name: "MAX_pool_mixed_8_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_7_chconcat"
   top: "MAX_pool_mixed_8_pool"
   pooling_param {
     pool: MAX
+    pad: 0
     kernel_size: 3
     stride: 2
-    pad: 0
   }
 }
 layer {
   name: "ch_concat_mixed_8_chconcat"
-  type: "Concat"
   bottom: "mixed_8_tower_conv_1_conv2d_relu"
-  bottom: "mixed_8_tower_1_conv_3_conv2d_relu"
-  bottom: "MAX_pool_mixed_8_pool"
+bottom: "mixed_8_tower_1_conv_3_conv2d_relu"
+bottom: "MAX_pool_mixed_8_pool"
+
   top: "ch_concat_mixed_8_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -4630,50 +4360,48 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_8_chconcat"
   top: "mixed_9_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 320
     bias_term: false
+    num_output: 320
     pad: 0
+    kernel_h: 1
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    kernel_h: 1
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_conv_conv2d"
   top: "mixed_9_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4681,55 +4409,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_conv_conv2d_bn"
   top: "mixed_9_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_8_chconcat"
   top: "mixed_9_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_conv_conv2d"
   top: "mixed_9_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4737,57 +4462,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_conv_conv2d_bn"
   top: "mixed_9_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_mixed_conv_conv2d"
   type: "Convolution"
   bottom: "mixed_9_tower_conv_conv2d_relu"
   top: "mixed_9_tower_mixed_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 0
+pad_w: 1
+    kernel_h: 1
+kernel_w: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 1
-    kernel_h: 1
-    kernel_w: 3
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_mixed_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_mixed_conv_conv2d"
   top: "mixed_9_tower_mixed_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4795,57 +4517,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_mixed_conv_conv2d_bn"
   top: "mixed_9_tower_mixed_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_mixed_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_9_tower_conv_conv2d_relu"
   top: "mixed_9_tower_mixed_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 1
+pad_w: 0
+    kernel_h: 3
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 1
-    pad_w: 0
-    kernel_h: 3
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_mixed_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_mixed_conv_1_conv2d"
   top: "mixed_9_tower_mixed_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4853,55 +4572,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_mixed_conv_1_conv2d_bn"
   top: "mixed_9_tower_mixed_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_8_chconcat"
   top: "mixed_9_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 448
     bias_term: false
+    num_output: 448
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_1_conv_conv2d"
   top: "mixed_9_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4909,55 +4625,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_1_conv_conv2d_bn"
   top: "mixed_9_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_9_tower_1_conv_conv2d_relu"
   top: "mixed_9_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_1_conv_1_conv2d"
   top: "mixed_9_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -4965,57 +4678,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_1_conv_1_conv2d_bn"
   top: "mixed_9_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_1_mixed_conv_conv2d"
   type: "Convolution"
   bottom: "mixed_9_tower_1_conv_1_conv2d_relu"
   top: "mixed_9_tower_1_mixed_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 0
+pad_w: 1
+    kernel_h: 1
+kernel_w: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 1
-    kernel_h: 1
-    kernel_w: 3
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_1_mixed_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_1_mixed_conv_conv2d"
   top: "mixed_9_tower_1_mixed_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5023,57 +4733,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_1_mixed_conv_conv2d_bn"
   top: "mixed_9_tower_1_mixed_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_9_tower_1_mixed_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_9_tower_1_conv_1_conv2d_relu"
   top: "mixed_9_tower_1_mixed_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 1
+pad_w: 0
+    kernel_h: 3
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 1
-    pad_w: 0
-    kernel_h: 3
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_1_mixed_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_1_mixed_conv_1_conv2d"
   top: "mixed_9_tower_1_mixed_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5081,67 +4788,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_9_tower_1_mixed_conv_1_conv2d_bn"
   top: "mixed_9_tower_1_mixed_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "AVE_pool_mixed_9_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_8_chconcat"
   top: "AVE_pool_mixed_9_pool"
   pooling_param {
     pool: AVE
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_9_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "AVE_pool_mixed_9_pool"
   top: "mixed_9_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_9_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_9_tower_2_conv_conv2d"
   top: "mixed_9_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5152,14 +4855,15 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_9_chconcat"
-  type: "Concat"
   bottom: "mixed_9_conv_conv2d_relu"
-  bottom: "mixed_9_tower_mixed_conv_conv2d_relu"
-  bottom: "mixed_9_tower_mixed_conv_1_conv2d_relu"
-  bottom: "mixed_9_tower_1_mixed_conv_conv2d_relu"
-  bottom: "mixed_9_tower_1_mixed_conv_1_conv2d_relu"
-  bottom: "mixed_9_tower_2_conv_conv2d_relu"
+bottom: "mixed_9_tower_mixed_conv_conv2d_relu"
+bottom: "mixed_9_tower_mixed_conv_1_conv2d_relu"
+bottom: "mixed_9_tower_1_mixed_conv_conv2d_relu"
+bottom: "mixed_9_tower_1_mixed_conv_1_conv2d_relu"
+bottom: "mixed_9_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_9_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -5169,50 +4873,48 @@ layer {
   type: "Convolution"
   bottom: "ch_concat_mixed_9_chconcat"
   top: "mixed_10_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 320
     bias_term: false
+    num_output: 320
     pad: 0
+    kernel_h: 1
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    kernel_h: 1
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_conv_conv2d"
   top: "mixed_10_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5220,55 +4922,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_conv_conv2d_bn"
   top: "mixed_10_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_9_chconcat"
   top: "mixed_10_tower_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_conv_conv2d"
   top: "mixed_10_tower_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5276,57 +4975,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_conv_conv2d_bn"
   top: "mixed_10_tower_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_mixed_conv_conv2d"
   type: "Convolution"
   bottom: "mixed_10_tower_conv_conv2d_relu"
   top: "mixed_10_tower_mixed_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 0
+pad_w: 1
+    kernel_h: 1
+kernel_w: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 1
-    kernel_h: 1
-    kernel_w: 3
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_mixed_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_mixed_conv_conv2d"
   top: "mixed_10_tower_mixed_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5334,57 +5030,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_mixed_conv_conv2d_bn"
   top: "mixed_10_tower_mixed_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_mixed_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_10_tower_conv_conv2d_relu"
   top: "mixed_10_tower_mixed_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 1
+pad_w: 0
+    kernel_h: 3
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 1
-    pad_w: 0
-    kernel_h: 3
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_mixed_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_mixed_conv_1_conv2d"
   top: "mixed_10_tower_mixed_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5392,55 +5085,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_mixed_conv_1_conv2d_bn"
   top: "mixed_10_tower_mixed_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_1_conv_conv2d"
   type: "Convolution"
   bottom: "ch_concat_mixed_9_chconcat"
   top: "mixed_10_tower_1_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 448
     bias_term: false
+    num_output: 448
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_1_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_1_conv_conv2d"
   top: "mixed_10_tower_1_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5448,55 +5138,52 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_1_conv_conv2d_bn"
   top: "mixed_10_tower_1_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_1_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_10_tower_1_conv_conv2d_relu"
   top: "mixed_10_tower_1_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
     pad: 1
     kernel_size: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_1_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_1_conv_1_conv2d"
   top: "mixed_10_tower_1_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5504,57 +5191,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_1_conv_1_conv2d_bn"
   top: "mixed_10_tower_1_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_1_mixed_conv_conv2d"
   type: "Convolution"
   bottom: "mixed_10_tower_1_conv_1_conv2d_relu"
   top: "mixed_10_tower_1_mixed_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 0
+pad_w: 1
+    kernel_h: 1
+kernel_w: 3
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 0
-    pad_w: 1
-    kernel_h: 1
-    kernel_w: 3
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_1_mixed_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_1_mixed_conv_conv2d"
   top: "mixed_10_tower_1_mixed_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5562,57 +5246,54 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_1_mixed_conv_conv2d_bn"
   top: "mixed_10_tower_1_mixed_conv_conv2d_relu"
-}
-layer {
+}layer {
   name: "mixed_10_tower_1_mixed_conv_1_conv2d"
   type: "Convolution"
   bottom: "mixed_10_tower_1_conv_1_conv2d_relu"
   top: "mixed_10_tower_1_mixed_conv_1_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 384
     bias_term: false
+    num_output: 384
+    pad_h: 1
+pad_w: 0
+    kernel_h: 3
+kernel_w: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
-    pad_h: 1
-    pad_w: 0
-    kernel_h: 3
-    kernel_w: 1
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_1_mixed_conv_1_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_1_mixed_conv_1_conv2d"
   top: "mixed_10_tower_1_mixed_conv_1_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5620,67 +5301,63 @@ layer {
   type: "ReLU"
   bottom: "mixed_10_tower_1_mixed_conv_1_conv2d_bn"
   top: "mixed_10_tower_1_mixed_conv_1_conv2d_relu"
-}
-layer {
+}layer {
   name: "MAX_pool_mixed_10_pool"
   type: "Pooling"
   bottom: "ch_concat_mixed_9_chconcat"
   top: "MAX_pool_mixed_10_pool"
   pooling_param {
     pool: MAX
+    pad: 1
     kernel_size: 3
     stride: 1
-    pad: 1
   }
-}
-layer {
+}layer {
   name: "mixed_10_tower_2_conv_conv2d"
   type: "Convolution"
   bottom: "MAX_pool_mixed_10_pool"
   top: "mixed_10_tower_2_conv_conv2d"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
+  # learning rate and decay multipliers for the filters
+  param { lr_mult: 1 decay_mult: 1 }
   convolution_param {
-    num_output: 192
     bias_term: false
+    num_output: 192
     pad: 0
     kernel_size: 1
     stride: 1
     weight_filler {
-      type: "gaussian"
-      std: 0.01
+        type: "gaussian"
+        std: 0.01
     }
   }
-}
-layer {
+
+}layer {
   name: "mixed_10_tower_2_conv_batchnorm"
   type: "BatchNorm"
   bottom: "mixed_10_tower_2_conv_conv2d"
   top: "mixed_10_tower_2_conv_conv2d_bn"
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
-  param {
-    lr_mult: 0.0
-  }
   batch_norm_param {
     use_global_stats: false
-    moving_average_fraction: 0.9997
     eps: 0.001
+    moving_average_fraction: 0.9997
     scale_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
     bias_filler {
       type: "constant"
-      value: 0.0
+      value: 0
     }
     engine: CUDNN
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
+  }
+  param {
+    lr_mult: 0
   }
 }
 layer {
@@ -5691,14 +5368,15 @@ layer {
 }
 layer {
   name: "ch_concat_mixed_10_chconcat"
-  type: "Concat"
   bottom: "mixed_10_conv_conv2d_relu"
-  bottom: "mixed_10_tower_mixed_conv_conv2d_relu"
-  bottom: "mixed_10_tower_mixed_conv_1_conv2d_relu"
-  bottom: "mixed_10_tower_1_mixed_conv_conv2d_relu"
-  bottom: "mixed_10_tower_1_mixed_conv_1_conv2d_relu"
-  bottom: "mixed_10_tower_2_conv_conv2d_relu"
+bottom: "mixed_10_tower_mixed_conv_conv2d_relu"
+bottom: "mixed_10_tower_mixed_conv_1_conv2d_relu"
+bottom: "mixed_10_tower_1_mixed_conv_conv2d_relu"
+bottom: "mixed_10_tower_1_mixed_conv_1_conv2d_relu"
+bottom: "mixed_10_tower_2_conv_conv2d_relu"
+
   top: "ch_concat_mixed_10_chconcat"
+  type: "Concat"
   concat_param {
     axis: 1
   }
@@ -5710,9 +5388,9 @@ layer {
   top: "global_pool"
   pooling_param {
     pool: AVE
+    pad: 0
     kernel_size: 8
     stride: 1
-    pad: 0
   }
 }
 layer {
@@ -5721,45 +5399,45 @@ layer {
   bottom: "global_pool"
   top: "global_pool"
   dropout_param {
-    dropout_ratio: 0.8
+    dropout_ratio: 0.800000
   }
 }
+
 layer {
   name: "flatten"
   type: "Flatten"
   bottom: "global_pool"
   top: "flatten"
-}
-layer {
+}layer {
   name: "fc1"
   type: "InnerProduct"
   bottom: "flatten"
   top: "fc1"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 2.0
-    decay_mult: 0.0
+    lr_mult: 2
+    decay_mult: 0
   }
   inner_product_param {
-    num_output: 1000
-    weight_filler {
-      type: "xavier"
+     num_output: 1000
+     weight_filler {
+        type: "xavier"
     }
-    bias_filler {
-      type: "constant"
-      value: 0.0
-    }
+     bias_filler {
+       type: "constant"
+       value: 0
+     }
   }
-}
-layer {
+}layer {
   name: "loss"
   type: "SoftmaxWithLoss"
   bottom: "fc1"
   bottom: "label"
   top: "loss"
+    exclude { stage: "deploy" }
 }
 layer {
   name: "acc/top-1"
@@ -5767,9 +5445,7 @@ layer {
   bottom: "fc1"
   bottom: "label"
   top: "acc/top-1"
-  include {
-    phase: TEST
-  }
+    include { stage: "val" }
 }
 layer {
   name: "acc/top-5"
@@ -5777,10 +5453,15 @@ layer {
   bottom: "fc1"
   bottom: "label"
   top: "acc/top-5"
-  include {
-    phase: TEST
-  }
+    include { stage: "val" }
   accuracy_param {
     top_k: 5
   }
+}
+layer {
+  name: "softmax"
+  type: "Softmax"
+  bottom: "fc1"
+  top: "softmax"
+  include { stage: "deploy" }
 }
